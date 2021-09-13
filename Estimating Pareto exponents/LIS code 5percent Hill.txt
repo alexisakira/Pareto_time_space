@@ -1,0 +1,96 @@
+getHillStar <- function(data,p){ #p is cutoff threshold 
+  ## data cleaning 
+  data <- data[which(data > 0)] # keep only positive values 
+  x <- sort(data, decreasing = TRUE); # sort in descending order 
+  N <- length(x); # sample size 
+  k <- round(p*N) 
+  ## estimate Pareto exponent and standard error 
+  y <- x[1:k]/x[k]; # normalization 
+  alpha <- 1/mean(log(y)); # Pareto exponent (Hill estimator) 
+  se <- alpha/sqrt(k); # standard error 
+  xmin <- x[k]; # cutoff point 
+  result <- list(alpha=alpha,se=se,xmin=xmin,k=k,Observations = length(x), 
+                 Min = min(x),Max = max(x),Mean = mean(x),Median = median(x)); 
+  return(result) 
+} 
+  
+ 
+p <- 0.05;  #This now denotes % how much statistics to take into account   
+datasets1 <- c('AU81h', 'AU85h', 'AU89h', 'AU95h', 'AU01h', 'AU03h', 'AU04h', 'AU08h', 'AU10h', 'AU14h',  
+'AT87h', 'AT94h', 'AT95h', 'AT97h', 'AT00h', 'AT04h', 'AT07h', 'AT10h', 'AT13h', 'AT16h',  
+'BE85h', 'BE88h', 'BE92h', 'BE95h', 'BE97h', 'BE00h', 'BE03h', 'BE04h', 'BE05h', 'BE06h', 'BE07h', 'BE08h', 'BE09h', 'BE10h', 'BE11h', 'BE12h', 'BE13h', 'BE14h', 'BE15h', 'BE16h', 'BE17h',  
+  
+'BR06h', 'BR09h', 'BR11h', 'BR13h', 'BR16h',  
+  
+'CA71h', 'CA75h', 'CA81h', 'CA87h', 'CA91h', 'CA94h', 'CA97h', 'CA98h', 'CA00h', 'CA04h', 'CA07h', 'CA10h', 'CA12h', 'CA13h', 'CA14h', 'CA15h', 'CA16h', 'CA17h', 'CA17h',  
+  
+'CL90h', 'CL92h', 'CL94h', 'CL96h', 'CL98h', 'CL00h', 'CL03h', 'CL06h', 'CL09h', 'CL11h', 'CL13h', 'CL15h', 'CL17h',  
+'CN02h', 'CN13h',  
+'CO04h', 'CO07h', 'CO10h', 'CO13h', 'CO16h',  
+'CZ92h', 'CZ96h', 'CZ02h', 'CZ04h', 'CZ07h', 'CZ10h', 'CZ13h', 'CZ16h', 'DK07h', 'DK10h', 'DK13h', 'DK16h',  
+'DK87h', 'DK92h', 'DK95h', 'DK00h', 'DK04h',  
+'DO07h',  
+'EG12h',  
+'EE00h', 'EE04h', 'EE07h', 'EE10h', 'EE13h', 'EE16h',  
+'FI87h', 'FI91h', 'FI95h', 'FI00h', 'FI04h', 'FI07h', 'FI10h', 'FI13h', 'FI16h',  
+'FR78h', 'FR84h', 'FR89h', 'FR94h', 'FR00h', 'FR05h', 'FR10h',  
+'DE73h', 'DE78h', 'DE81h', 'DE83h', 'DE84h', 'DE87h', 'DE89h', 'DE91h', 'DE94h', 'DE95h', 'DE98h', 'DE00h', 'DE01h', 'DE02h', 'DE03h', 'DE04h', 'DE05h', 'DE06h', 'DE07h', 'DE08h', 'DE09h', 'DE10h', 'DE11h', 'DE12h', 'DE13h', 'DE14h', 'DE15h', 'DE16h',  
+  
+'GE10h', 'GE13h', 'GE16h',  
+'GR95h', 'GR00h', 'GR04h', 'GR07h', 'GR10h', 'GR13h', 'GR16h',  
+'GT06h', 'GT11h', 'GT14h',  
+'HU91h', 'HU94h', 'HU99h', 'HU05h', 'HU07h', 'HU09h', 'HU12h', 'HU15h',  
+'IS04h', 'IS07h', 'IS10h',  
+'IN04h', 'IN11h',  
+'IE87h', 'IE94h', 'IE95h', 'IE96h', 'IE00h', 'IE02h', 'IE03h', 'IE04h', 'IE05h', 'IE06h', 'IE07h', 'IE08h', 'IE09h', 'IE10h', 'IE11h', 'IE12h', 'IE13h', 'IE14h', 'IE15h', 'IE16h', 'IE17h',  
+  
+  
+'IL79h', 'IL86h', 'IL92h', 'IL97h', 'IL01h', 'IL02h', 'IL03h', 'IL04h', 'IL05h', 'IL06h', 'IL07h', 'IL08h', 'IL09h', 'IL10h', 'IL11h', 'IL12h', 'IL13h', 'IL14h', 'IL15h', 'IL16h', 'IL17h', 'IL18h',  
+'IT86h', 'IT87h', 'IT89h', 'IT91h', 'IT93h', 'IT95h', 'IT98h', 'IT00h', 'IT04h', 'IT08h', 'IT10h', 'IT14h', 'IT16h',  
+  
+'CI02h', 'CI08h', 'CI15h',  
+'JP08h', 'JP10h', 'JP13h',  
+  
+'LT09h', 'LT10h', 'LT11h', 'LT12h', 'LT13h', 'LT14h', 'LT15h', 'LT16h', 'LT17h',  
+'LU85h', 'LU91h', 'LU94h', 'LU97h', 'LU00h', 'LU04h', 'LU07h', 'LU10h', 'LU13h',  
+  
+'MX84h', 'MX89h', 'MX92h', 'MX94h', 'MX96h', 'MX98h', 'MX00h', 'MX02h', 'MX04h', 'MX08h', 'MX10h', 'MX12h', 'MX14h', 'MX16h', 'MX18h',  
+  
+  
+'NL83h', 'NL87h', 'NL90h', 'NL93h', 'NL99h', 'NL04h', 'NL07h', 'NL10h', 'NL13h',  
+  
+'NO79h', 'NO86h', 'NO91h', 'NO95h', 'NO00h', 'NO04h', 'NO07h', 'NO10h', 'NO13h', 'NO16h',  
+'PS17h',  
+'PA07h', 'PA10h', 'PA13h', 'PA16h',  
+'PY00h', 'PY04h', 'PY07h', 'PY10h', 'PY13h', 'PY16h',  
+'PE04h', 'PE07h', 'PE10h', 'PE13h', 'PE16h',  
+'PL86h', 'PL92h', 'PL95h', 'PL99h', 'PL04h', 'PL07h', 'PL10h', 'PL13h', 'PL16h',  
+'RO95h', 'RO97h',  
+  
+'RU00h', 'RU04h', 'RU07h', 'RU10h', 'RU11h', 'RU13h', 'RU14h', 'RU15h', 'RU16h', 'RU17h',  
+'RS06h', 'RS10h', 'RS13h', 'RS16h',  
+'SK92h', 'SK96h', 'SK04h', 'SK07h', 'SK10h', 'SK13h', 'SK14h', 'SK15h', 'SK16h', 'SK17h', 'SK18h',  
+'SI97h', 'SI99h', 'SI04h', 'SI07h', 'SI10h', 'SI12h', 'SI15h',  
+'ZA08h', 'ZA10h', 'ZA12h', 'ZA15h', 'ZA17h',  
+'KR06h', 'KR08h', 'KR10h', 'KR12h', 'KR14h', 'KR16h',  
+'ES80h', 'ES85h', 'ES90h', 'ES95h', 'ES00h', 'ES04h', 'ES07h', 'ES10h', 'ES13h', 'ES16h',  
+'SE67h', 'SE75h', 'SE81h', 'SE87h', 'SE92h', 'SE95h', 'SE00h', 'SE05h',  
+  
+'CH82h', 'CH92h', 'CH00h', 'CH02h', 'CH04h', 'CH06h', 'CH07h', 'CH08h', 'CH09h', 'CH10h', 'CH11h', 'CH12h', 'CH13h', 'CH14h', 'CH15h', 'CH16h', 'CH17h',  
+  
+'TW81h', 'TW86h', 'TW91h', 'TW95h', 'TW97h', 'TW00h', 'TW05h', 'TW07h', 'TW10h', 'TW13h', 'TW16h',  
+  
+'UK69h', 'UK74h', 'UK79h', 'UK86h', 'UK91h', 'UK94h', 'UK95h', 'UK96h', 'UK97h', 'UK98h', 'UK99h', 'UK00h', 'UK01h', 'UK02h', 'UK03h', 'UK04h', 'UK05h', 'UK06h', 'UK07h', 'UK08h', 'UK09h', 'UK10h', 'UK11h', 'UK12h', 'UK13h', 'UK14h', 'UK15h', 'UK16h', 'UK17h', 'UK18h',  
+  
+'US74h', 'US79h', 'US86h', 'US91h', 'US92h', 'US93h', 'US94h', 'US95h', 'US96h', 'US97h', 'US98h', 'US99h', 'US00h', 'US01h', 'US02h', 'US03h', 'US04h', 'US05h', 'US06h', 'US07h', 'US08h', 'US09h', 'US10h', 'US11h', 'US12h', 'US13h', 'US14h', 'US15h', 'US16h', 'US17h', 'US18h', 
+  
+'UY04h', 'UY07h', 'UY10h', 'UY13h', 'UY16h',  
+'VN11h', 'VN13h')  
+  
+  
+  
+for (ccyy in datasets1) {  
+  
+df <- read.LIS(ccyy);   
+print(getHillStar(df$hilabour,p)) #Household income, change hilabour --> hicapital to get capital income 
+}
