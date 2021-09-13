@@ -1,0 +1,91 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{test}
+\usepackage[authoryear,round]{natbib}
+\usepackage{authblk}
+\usepackage{hyperref}
+\usepackage{doi}
+
+\title{\textsc{Matlab} files for Pareto Extrapolation}
+
+\author[1]{{\'E}milien Gouin-Bonenfant\thanks{Email: \href{mailto:eg3041@columbia.edu}{eg3041@columbia.edu}.}}
+\affil[1]{Department of Economics, Columbia University}
+\author[2]{Alexis Akira Toda\thanks{Email: \href{mailto:atoda@ucsd.edu}{atoda@ucsd.edu}.}}
+\affil[2]{Department of Economics, University of California San Diego}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This note explains the functionalities in the \textsc{Matlab} package \texttt{PE}, which implements the Pareto Extrapolation algorithm. The user should use these files at their own responsibility. Whenever you use these codes for your research, please cite \cite{Gouin-BonenfantTodaParetoExtrapolation}.
+
+\section{Package content}
+
+There are three main functionalities for Pareto extrapolation:
+\begin{itemize}
+\item \verb|getZeta.m|
+\item \verb|getQ.m|
+\item \verb|getTopShares.m|
+\end{itemize}
+In addition, \verb|example.m| contains a simple example.
+
+\subsection{Computing Pareto exponent}
+\verb|getZeta.m| computes the Pareto exponent using the \cite{BeareToda-dPL} formula. The usage is
+$$\verb|zeta = getZeta(PS,PJ,p,G,zetaBound)|$$
+where
+\begin{itemize}
+\item \verb|PS| is the $S\times S$ transition probability matrix of exogenous states indexed by $s=1,\dots,S$,
+\item \verb|PJ| is the $S^2\times J$ matrix of conditional probabilities of transitory states indexed by $j=1,\dots,J$,
+\item \verb|p| is the birth/death probability $p\in [0,1)$,
+\item \verb|G| is the $S^2\times J$ matrix of gross growth rates, and
+\item \verb|zetaBound| is a vector $(\ubar{\zeta},\bar{\zeta})$ that specifies the lower and upper bounds to search for the Pareto exponent (optional).
+\end{itemize}
+The $S^2$ rows in \verb|PJ| and \verb|G| should be ordered such that 
+$$(s,s')=(1,1),\dots,(1,S);\dots; (s,1),\dots,(s,S);\dots; (S,1),\dots,(S,S).$$
+If $\verb|PS| = P=(p_{ss'})$, $\verb|PJ| = (\pi_{ss'j})$, and $\verb|G| = (G_{ss'j})$, then the Pareto exponent $z=\zeta$ is the solution to
+$$(1-p)\rho (P\odot M(z))=1,$$
+where $\rho$ is the spectral radius and $M(z)=(M_{ss'}(z))$,
+$$M_{ss'}(z)=\sum_{j=1}^J\pi_{ss'j}G_{ss'j}^z,$$
+and $\odot$ is the Hadamard (entry-wise) product.
+
+\verb|PJ| can be either $1\times J$, $S\times J$, or $S^2\times J$. If it is $1\times J$, it assumes $\pi_{ss'j}=\pi_j$ depends only on $j$. If it is $S\times J$, it assumes $\pi_{ss'j}=\pi_{sj}$ depends only on $(s,j)$.
+
+\verb|G| can be either $S\times J$ or $S^2\times J$. If it is $S\times J$, it assumes $G_{ss'j}=G_{sj}$ depends only on $(s,j)$.
+
+\subsection{Computing joint transition probability matrix}
+
+\verb|getQ.m| computes the $SN\times SN$ joint transition probability matrix $Q=(q_{sn,s'n'})$ and the stationary distribution $\pi=(\pi_{sn})$ for the exogenous state $s$ and wealth. The usage is
+$$\verb|[Q,pi] = getQ(PS,PJ,p,x0,xGrid,gstjn,Gstj,zeta,h)|$$
+where
+\begin{itemize}
+\item \verb|PS|, \verb|PJ|, \verb|p| are as above,
+\item \verb|x0| is the initial wealth of newborn agents,
+\item \verb|xGrid| is the $1\times N$ grid of wealth (size variable) $w_n$,
+\item \verb|gstjn| is the $S^2\times JN$ matrix of law of motion for wealth $g_{ss'j}(w_n)$,
+\item \verb|Gstj| is the $S^2\times J$ matrix of asymptotic slopes of law of motion $G_{ss'j}$ (optional),
+\item \verb|zeta| is the Pareto exponent (optional), and
+\item \verb|h| is the grid spacing for hypothetical grid points (optional).
+\end{itemize}
+The $JN$ columns of \verb|gstjn| must be ordered such that the first $N$ columns correspond to $j=1$, the next $N$ columns correspond to $j=2$, and so on. \verb|Gstj| is the same as \verb|G| in \verb|getZeta.m|. If unspecified, it uses the slope of the law of motion between the two largest grid points. If \verb|zeta| is unspecified, it calls \verb|getZeta.m| to compute. If \verb|h| is unspecified, it uses the distance between the two largest grid points.
+
+\verb|gstjn| can be either $S\times JN$ or $S^2\times JN$. If it is $S\times JN$, it assumes $g_{ss'j}(w_n)=g_{sj}(w_n)$ depends only on $(s,j,n)$.
+
+\subsection{Computing top wealth shares}
+
+\verb|getTopShares.m| computes the top wealth shares. The usage is
+$$\verb|topShare = getTopShares(topProb,wGrid,wDist,zeta)|$$
+where
+\begin{itemize}
+\item \verb|topProb| is the vector of top probabilities to evaluate top shares,
+\item \verb|wGrid| is the $1\times N$ vector of wealth grid,
+\item \verb|wDist| is the $1\times N$ vector of wealth distribution, and
+\item \verb|zeta| is the Pareto exponent (optional).
+\end{itemize}
+Given the stationary distribution $\pi$ computed using \verb|getQ.m|, one can compute the wealth distribution as $\pi_n=\sum_{s=1}^S\pi_{sn}$. If \verb|zeta| is unspecified, \verb|getTopShares.m| uses spline interpolation to compute top wealth shares.
+
+\bibliographystyle{plainnat}
+\bibliography{reference}
+
+\end{document}
