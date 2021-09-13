@@ -1,3 +1,7 @@
+Replication files for "Capital and Labor Income Pareto Exponents across Time and Space", Section 3
+by Tjeerd de Vries and Alexis Akira Toda, Review of Income and Wealth
+
+
 To replicate the Pareto exponent estimates, as well as the test statistics reported in Appendix Table C (omitted for publication),
 follow the steps:
 
